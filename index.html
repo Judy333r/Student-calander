@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My School Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff0f6;--card:#fff;--ac:#c2255c;--tx:#2b2433;--on:#fff;--e:"🌸";--bd:color-mix(in srgb,var(--ac) 28%,transparent);--r:20px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Quicksand","Tajawal","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);transition:background .3s,color .3s;line-height:1.5}
+body::before,body::after{content:var(--e);position:fixed;font-size:4rem;opacity:.14;pointer-events:none}
+body::before{top:70px;inset-inline-end:14px}
+body::after{bottom:10px;inset-inline-start:14px}
+main{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:16px}
+nav{position:sticky;top:0;z-index:5;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:8px;background:var(--card);border-bottom:2px solid var(--bd)}
+nav button{border:0;background:none;color:var(--tx);font:inherit;font-weight:600;padding:8px 12px;border-radius:99px;cursor:pointer}
+nav button[aria-current=page]{background:var(--ac);color:var(--on)}
+button,input,textarea{font:inherit}
+.btn{background:var(--ac);color:var(--on);border:0;border-radius:99px;padding:10px 18px;min-height:44px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .15s}
+.btn:hover{opacity:.88;transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--tx);border:2px solid var(--bd)}
+.ib{border:0;background:none;color:var(--tx);cursor:pointer;font-size:1rem;min-width:36px;min-height:36px;border-radius:10px}
+.ib:hover{background:var(--bd)}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.card{background:var(--card);border:2px solid var(--bd);border-radius:var(--r);padding:16px;margin:0 0 16px;box-shadow:0 6px 18px rgba(0,0,0,.07)}
+.card h3{margin:0 0 10px}
+.card.exam{border-color:#e03131;border-width:3px}
+.hero{text-align:center;padding:30px 0}
+.hero h1{font-size:clamp(1.6rem,6vw,2.6rem);margin:0 0 24px}
+.hero input{font-size:inherit;font-weight:700;width:min(60vw,9ch);min-width:5ch;text-align:center;border:0;border-bottom:3px dashed var(--ac);background:transparent;color:var(--ac)}
+.orb{display:block;margin:0 auto 24px;width:150px;height:150px;border-radius:50%;border:5px solid var(--card);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:3.4rem;cursor:pointer;transition:transform .2s}
+.orb:hover{transform:scale(1.06) rotate(6deg)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.bar h2{margin:0;font-size:1.3rem}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.grid b{text-align:center;font-size:.8rem;padding:4px 0}
+.cell{min-height:68px;padding:4px;border:2px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);text-align:start;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.cell:hover{border-color:var(--ac)}
+.cell.today{background:var(--ac);color:var(--on)}
+.cell.blank{visibility:hidden}
+.cell small{font-size:.6rem;line-height:1.2;font-weight:700}
+.cell .x{color:#e03131}.cell.today .x{color:inherit}
+.chip{display:inline-block;padding:4px 10px;margin:3px;border-radius:99px;background:var(--bd);font-weight:600}
+.up{color:#1b7a34;font-weight:700}.dn{color:#c92a2a;font-weight:700}
+.dark-on .up{color:#69db7c}.dark-on .dn{color:#ff8787}
+summary{cursor:pointer}
+ul,ol{list-style:none;margin:0;padding:0}
+li{display:flex;gap:8px;align-items:flex-start;justify-content:space-between;padding:8px 0;border-top:1px dashed var(--bd)}
+li:first-child{border-top:0}
+li.done b{text-decoration:line-through;opacity:.55}
+li p{margin:2px 0;font-size:.9rem}
+li .acts{white-space:nowrap}
+.empty{opacity:.7;margin:6px 0}
+textarea{width:100%;min-height:140px;border:2px solid var(--bd);border-radius:14px;padding:10px;background:var(--bg);color:var(--tx)}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.tbtn{border:3px solid var(--bd);border-radius:var(--r);padding:12px 6px;cursor:pointer;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tbtn[aria-pressed=true]{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac)}
+.tbtn span{font-size:1.8rem}
+input[type=color]{width:70px;height:44px;border:0;background:none;cursor:pointer}
+dialog{border:3px solid var(--ac);border-radius:var(--r);padding:20px;width:min(92vw,420px);background:var(--card);color:var(--tx)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog label{display:block;margin:10px 0;font-weight:600;font-size:.9rem}
+dialog input:not([type=checkbox]){display:block;width:100%;padding:10px;margin-top:4px;border:2px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)}
+dialog textarea{min-height:80px;margin-top:4px}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+@media(max-width:600px){main{padding:10px}.cell{min-height:58px}.cell small{font-size:.55rem}.orb{width:120px;height:120px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<dialog id="dlg"></dialog>
+<noscript>Please enable JavaScript to use this planner.</noscript>
+<script>
+'use strict';
+const K = 'plannerV1', $ = s => document.querySelector(s);
+
+/* ---------- Themes: id, emoji, en, ar, bg, card, accent, text ---------- */
+const TH = [
+['flowers','🌸','Flowers','أزهار','#fff0f6','#ffffff','#c2255c','#2b2433'],
+['ocean','🌊','Ocean','محيط','#e3f6fc','#ffffff','#0b7285','#12303a'],
+['night','🌙','Night Sky','سماء الليل','#1b1b3a','#2a2a55','#b197fc','#f1ecff'],
+['clouds','☁️','Clouds','غيوم','#eef3fb','#ffffff','#4263eb','#1f2a44'],
+['cute','🍓','Cute','لطيف','#fff0f0','#ffffff','#e03131','#3a2326'],
+['space','🪐','Space','فضاء','#0f1226','#1c2040','#74c0fc','#e8ecff'],
+['academic','📚','Academic','أكاديمي','#f6f1e7','#fffdf8','#7b4b2a','#2e2418'],
+['nature','🌿','Nature','طبيعة','#ecf7ea','#ffffff','#2b8a3e','#1c2e20'],
+['pastel','🎀','Pastel','باستيل','#f3eaff','#ffffff','#7048e8','#2a2340'],
+['dark','🖤','Dark','داكن','#141414','#232323','#ff8fab','#f5f5f5'],
+['sparkly','✨','Sparkly','لامع','#fff9db','#ffffff','#a61e4d','#33270a'],
+['soft','🧸','Soft','ناعم','#fbf0e6','#fffaf5','#a9683b','#3b2a1e'],
+['sunset','🌅','Sunset','غروب','#fff1e6','#ffffff','#d9480f','#3a2112'],
+['minimal','◻️','Minimal','بسيط','#f5f5f5','#ffffff','#212529','#212529']
+];
+
+/* ---------- Translations ---------- */
+const T = {
+en: {home:'Home',calendar:'Calendar',schedule:'Schedule',themes:'Themes',settings:'Settings',back:'Back',cal:'Calendar',name:'Your name',
+themeT:'Choose Your Theme',custom:'Custom Color',lang:'Language',data:'Data',reset:'Reset all data',
+resetQ:'Delete ALL your data permanently? This cannot be undone.',cancel:'Cancel',save:'Save',add:'Add',edit:'Edit',del:'Delete',
+subjects:"Today's Subjects",none:'No subjects yet',work:'School Work',exams:'Exams',rem:'Reminders',notes:'Notes',
+addSubj:'+ Add Subject',addTask:'+ Add Task',addExam:'+ Add Exam',addRem:'+ Add Reminder',tmr:'Tomorrow',
+extra:'Extra Subjects',ded:'Deducted Subjects',added:'Added',notSch:'Not scheduled',same:'Tomorrow has the same subjects',
+title:'Title',descr:'Description (optional)',subject:'Subject (optional)',subjectReq:'Subject',due:'Due date (optional)',time:'Time (optional)',
+mySched:'My School Schedule',tasks:'tasks',reminders:'reminders',exam:'Exam',exs:'Exams',examTitle:'Exam title',notesL:'Notes',
+empty:'Nothing here yet',scan:'Import from a photo',scanHint:'Upload a photo of your timetable and the text is read on your device (the photo is never uploaded). Check and fix the text, then add it.',scanning:'Reading your photo… the first time can take a moment',scanDone:'Done. Check the text, fix any mistakes, then tap Add.',scanFail:'Could not read the photo. Check your internet or try a clearer, straighter picture.',scanPh:'The text appears here. Put each day name on its own line, then its subjects under it.',scanAdd:'Add to my schedule',scanNone:'No days or subjects found. Put each day name on a line, then its subjects below it.',prev:'Previous Month',next:'Next Month',up:'Move up',dn:'Move down',notePh:'Write anything here…',
+hint:'Tap a date to open it.',done:'Done',colorL:'Pick any color'},
+ar: {home:'الرئيسية',calendar:'التقويم',schedule:'الجدول',themes:'السمات',settings:'الإعدادات',back:'رجوع',cal:'تقويم',name:'اسمك',
+themeT:'اختر سمتك',custom:'لون مخصص',lang:'اللغة',data:'البيانات',reset:'حذف كل البيانات',
+resetQ:'هل تريد حذف كل بياناتك نهائياً؟ لا يمكن التراجع.',cancel:'إلغاء',save:'حفظ',add:'إضافة',edit:'تعديل',del:'حذف',
+subjects:'مواد اليوم',none:'لا توجد مواد بعد',work:'الواجبات المدرسية',exams:'الامتحانات',rem:'التذكيرات',notes:'ملاحظات',
+addSubj:'+ إضافة مادة',addTask:'+ إضافة مهمة',addExam:'+ إضافة امتحان',addRem:'+ إضافة تذكير',tmr:'غداً',
+extra:'مواد إضافية',ded:'مواد محذوفة',added:'مضافة',notSch:'غير مجدولة',same:'غداً نفس المواد',
+title:'العنوان',descr:'الوصف (اختياري)',subject:'المادة (اختياري)',subjectReq:'المادة',due:'تاريخ التسليم (اختياري)',time:'الوقت (اختياري)',
+mySched:'جدولي الدراسي',tasks:'مهام',reminders:'تذكيرات',exam:'امتحان',exs:'امتحانات',examTitle:'عنوان الامتحان',notesL:'ملاحظات',
+empty:'لا يوجد شيء هنا بعد',scan:'استيراد من صورة',scanHint:'ارفع صورة جدولك وسيتم قراءة النص على جهازك (لا يتم رفع الصورة لأي مكان). راجع النص وصححه ثم أضفه.',scanning:'جارٍ قراءة الصورة… قد تستغرق المرة الأولى بعض الوقت',scanDone:'تمت القراءة. راجع النص وصحح الأخطاء ثم اضغط إضافة.',scanFail:'تعذرت قراءة الصورة. تحقق من الإنترنت أو جرّب صورة أوضح ومستقيمة.',scanPh:'سيظهر النص هنا. ضع اسم كل يوم في سطر ثم موادّه تحته.',scanAdd:'إضافة إلى جدولي',scanNone:'لم أجد أياماً أو مواد. ضع اسم كل يوم في سطر ثم موادّه تحته.',prev:'الشهر السابق',next:'الشهر التالي',up:'أعلى',dn:'أسفل',notePh:'اكتب أي شيء هنا…',
+hint:'اضغط على تاريخ لفتحه.',done:'تم',colorL:'اختر أي لون'}
+};
+
+/* ---------- State ---------- */
+const now = new Date();
+const defaults = () => ({name:'',lang:'en',theme:'flowers',color:'#c2255c',tt:{},work:{},exam:{},rem:{},notes:{},y:now.getFullYear(),m:now.getMonth()});
+let S = defaults(), V = 'home', P = null;
+try { S = Object.assign(defaults(), JSON.parse(localStorage.getItem(K)) || {}); } catch (e) { S = defaults(); }
+const save = () => { try { localStorage.setItem(K, JSON.stringify(S)); } catch (e) {} };
+
+const t = k => (T[S.lang] || T.en)[k] || T.en[k] || k;
+const ar = () => S.lang === 'ar';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
+const fmt = (d, o) => new Intl.DateTimeFormat(ar() ? 'ar-u-ca-gregory' : 'en-US', o).format(d);
+const key = (y, m, d) => y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+const pk = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const cur = () => {
+  if (S.theme === 'custom') return {bg:`color-mix(in srgb,${S.color} 14%,#ffffff)`,card:'#ffffff',ac:S.color,tx:'#2b2433',e:'🎨'};
+  const x = TH.find(a => a[0] === S.theme) || TH[0];
+  return {bg:x[4],card:x[5],ac:x[6],tx:x[7],e:x[1]};
+};
+const lum = h => { const n = parseInt(h.slice(1), 16); return (.299 * (n >> 16) + .587 * (n >> 8 & 255) + .114 * (n & 255)) / 255; };
+
+function apply() {
+  const c = cur(), r = document.documentElement, s = r.style;
+  s.setProperty('--bg', c.bg); s.setProperty('--card', c.card); s.setProperty('--ac', c.ac);
+  s.setProperty('--tx', c.tx); s.setProperty('--on', lum(c.ac) > .6 ? '#1b1b1b' : '#ffffff');
+  s.setProperty('--e', '"' + c.e + '"');
+  r.lang = S.lang; r.dir = ar() ? 'rtl' : 'ltr';
+  document.body.classList.toggle('dark-on', lum(c.card) < .4);
+}
+
+/* ---------- Navigation ---------- */
+const go = (v, p) => { V = v; P = p || null; R(); scrollTo(0, 0); };
+const back = () => go(V === 'day' ? 'cal' : 'home');
+const backBtn = () => V === 'home' ? '' : `<button class="btn ghost" onclick="back()">${ar() ? '→' : '←'} ${t('back')}</button>`;
+const nav = () => [['home','🏠','home'],['cal','📅','calendar'],['sch','📚','schedule'],['th','🎨','themes'],['set','⚙️','settings']]
+  .map(([v, i, l]) => `<button onclick="go('${v}')" ${(V === v || (V === 'day' && v === 'cal')) ? 'aria-current="page"' : ''}>${i} ${t(l)}</button>`).join('');
+
+function R() {
+  apply();
+  const views = {home, cal, day, sch, th, set};
+  $('#app').innerHTML = `<nav>${nav()}</nav><main>${(views[V] || home)()}</main>`;
+}
+
+/* ---------- Views ---------- */
+function home() {
+  const c = cur(), inp = `<input id="nm" value="${esc(S.name)}" placeholder="${t('name')}" aria-label="${t('name')}" oninput="S.name=this.value;save()">`;
+  return `<section class="hero"><h1>${ar() ? t('cal') + ' ' + inp : inp + '’s ' + t('cal')}</h1>
+  <button class="orb" onclick="go('th')" aria-label="${t('themes')}" style="background:linear-gradient(135deg,${c.bg},${c.ac})">${c.e}</button>
+  <button class="btn" onclick="go('cal')">📅 ${t('calendar')}</button></section>`;
+}
+
+function mv(d) {
+  S.m += d;
+  if (S.m < 0) { S.m = 11; S.y--; } else if (S.m > 11) { S.m = 0; S.y++; }
+  save(); R();
+}
+
+function cal() {
+  const f = new Date(S.y, S.m, 1), n = new Date(S.y, S.m + 1, 0).getDate();
+  const tk = key(now.getFullYear(), now.getMonth(), now.getDate());
+  let h = `${backBtn()}<div class="bar"><button class="btn" onclick="mv(-1)">${ar() ? '→' : '←'} ${t('prev')}</button>
+  <h2>${fmt(f, {month:'long', year:'numeric'})}</h2><button class="btn" onclick="mv(1)">${t('next')} ${ar() ? '←' : '→'}</button></div><div class="grid">`;
+  for (let i = 0; i < 7; i++) h += `<b>${fmt(new Date(2023, 0, 1 + i), {weekday:'short'})}</b>`;
+  for (let i = 0; i < f.getDay(); i++) h += '<span class="cell blank"></span>';
+  for (let d = 1; d <= n; d++) {
+    const k = key(S.y, S.m, d), e = (S.exam[k] || []).length, w = (S.work[k] || []).length, r = (S.rem[k] || []).length;
+    h += `<button class="cell ${k === tk ? 'today' : ''}" onclick="go('day','${k}')" aria-label="${fmt(new Date(S.y, S.m, d), {dateStyle:'full'})}"><span>${d}</span>
+    ${e ? `<small class="x">🔴 ${e > 1 ? e + ' ' + t('exs') : t('exam')}</small>` : ''}
+    ${w ? `<small>📝 ${w} ${t('tasks')}</small>` : ''}${r ? `<small>🔔 ${r}</small>` : ''}</button>`;
+  }
+  return h + `</div><p class="empty">${t('hint')}</p>`;
+}
+
+const nm = s => s.n.trim().toLowerCase();
+
+function day() {
+  const k = P, d = pk(k), dow = d.getDay();
+  const td = S.tt[dow] || [], tm = S.tt[(dow + 1) % 7] || [];
+  const add = tm.filter(s => !td.some(o => nm(o) === nm(s))), ded = td.filter(s => !tm.some(o => nm(o) === nm(s)));
+  const names = a => a.map(s => esc(s.n)).join(', ');
+  const diff = (add.length || ded.length)
+    ? `<details><summary>${add.length ? `<div class="up">🟢 ↑ ${t('extra')}: ${names(add)}</div>` : ''}${ded.length ? `<div class="dn">🔴 ↓ ${t('ded')}: ${names(ded)}</div>` : ''}</summary>
+       <p><b>${t('tmr')}</b></p>${add.map(s => `<div class="up">🟢 ${esc(s.n)} — ${t('added')}</div>`).join('')}${ded.map(s => `<div class="dn">🔴 ${esc(s.n)} — ${t('notSch')}</div>`).join('')}</details>`
+    : `<p class="empty">${t('same')}</p>`;
+  return `${backBtn()}<h2>${fmt(d, {weekday:'long', month:'long', day:'numeric'})}</h2>
+  <section class="card"><h3>📚 ${t('subjects')}</h3>${td.length ? td.map(s => `<span class="chip">📘 ${esc(s.n)}</span>`).join('') : `<p class="empty">${t('none')}</p>`}
+  <div style="margin-top:10px">${diff}</div></section>
+  <section class="card exam"><h3>🔴 ${t('exams')}</h3>${items('exam', k)}<button class="btn" onclick="fm('exam','${k}')">${t('addExam')}</button></section>
+  <section class="card"><h3>📚 ${t('work')}</h3>${items('work', k)}<button class="btn" onclick="fm('work','${k}')">${t('addTask')}</button></section>
+  <section class="card"><h3>🔔 ${t('rem')}</h3>${items('rem', k)}<button class="btn" onclick="fm('rem','${k}')">${t('addRem')}</button></section>
+  <section class="card"><h3>📝 ${t('notes')}</h3><textarea aria-label="${t('notes')}" placeholder="${t('notePh')}" oninput="S.notes['${k}']=this.value;save()">${esc(S.notes[k] || '')}</textarea></section>`;
+}
+
+function items(kind, k) {
+  const a = S[kind][k] || [];
+  if (!a.length) return `<p class="empty">${t('empty')}</p>`;
+  return '<ul>' + a.map(i => {
+    const acts = `<span class="acts"><button class="ib" aria-label="${t('edit')}" onclick="fm('${kind}','${k}',${i.id})">✏️</button><button class="ib" aria-label="${t('del')}" onclick="dl('${kind}','${k}',${i.id})">🗑️</button></span>`;
+    if (kind === 'work') return `<li class="${i.done ? 'done' : ''}"><label><input type="checkbox" ${i.done ? 'checked' : ''} onchange="tg('${k}',${i.id})"> <b>${i.s ? esc(i.s) + ' — ' : ''}${esc(i.t)}</b>${i.d ? `<p>${esc(i.d)}</p>` : ''}${i.due ? `<p>⏰ ${esc(i.due)}</p>` : ''}</label>${acts}</li>`;
+    if (kind === 'exam') return `<li><div><b>${esc(i.s)}${i.t ? ' — ' + esc(i.t) : ''}</b>${i.tm ? `<p>🕗 ${esc(i.tm)}</p>` : ''}${i.n ? `<p>${esc(i.n)}</p>` : ''}</div>${acts}</li>`;
+    return `<li><b>🔔 ${esc(i.t)}${i.tm ? ' — ' + esc(i.tm) : ''}</b>${acts}</li>`;
+  }).join('') + '</ul>';
+}
+
+function sch() {
+  return `${backBtn()}<h2>${t('mySched')}</h2>${scanCard()}` + [1,2,3,4,5,6,0].map(dw => {
+    const a = S.tt[dw] || [];
+    return `<section class="card"><h3>${fmt(new Date(2023, 0, 1 + dw), {weekday:'long'})}</h3>${a.length ? '<ol>' + a.map((s, i) =>
+      `<li><b>${i + 1}. ${esc(s.n)}</b><span class="acts"><button class="ib" aria-label="${t('up')}" onclick="mu(${dw},${i},-1)">▲</button><button class="ib" aria-label="${t('dn')}" onclick="mu(${dw},${i},1)">▼</button>
+      <button class="ib" aria-label="${t('edit')}" onclick="fm('tt',${dw},${s.id})">✏️</button><button class="ib" aria-label="${t('del')}" onclick="dl('tt',${dw},${s.id})">🗑️</button></span></li>`).join('') + '</ol>' : `<p class="empty">${t('none')}</p>`}
+      <button class="btn" onclick="fm('tt',${dw})">${t('addSubj')}</button></section>`;
+  }).join('');
+}
+
+function th() {
+  return `${backBtn()}<h2>${t('themeT')}</h2><div class="themes">` + TH.map(x =>
+    `<button class="tbtn" aria-pressed="${S.theme === x[0]}" onclick="st('${x[0]}')" style="background:${x[5]};color:${x[7]}"><span>${x[1]}</span>${ar() ? x[3] : x[2]}</button>`).join('') +
+    `</div><section class="card" style="margin-top:16px"><h3>🎨 ${t('custom')}</h3><label>${t('colorL')} <input type="color" value="${S.color}" oninput="cc(this.value)"></label></section>`;
+}
+
+function set() {
+  return `${backBtn()}<h2>⚙️ ${t('settings')}</h2>
+  <section class="card"><h3>${t('lang')}</h3><button class="btn ${S.lang === 'en' ? '' : 'ghost'}" onclick="sl('en')">🇬🇧 English</button> <button class="btn ${S.lang === 'ar' ? '' : 'ghost'}" onclick="sl('ar')">🇸🇦 العربية</button></section>
+  <section class="card"><h3>${t('themes')}</h3><button class="btn" onclick="go('th')">🎨 ${t('themes')}</button>
+  <p><label>${t('custom')}: <input type="color" value="${S.color}" oninput="cc(this.value)"></label></p></section>
+  <section class="card"><h3>${t('data')}</h3><button class="btn" style="background:#c92a2a;color:#fff" onclick="rs()">🗑️ ${t('reset')}</button></section>`;
+}
+
+/* ---------- Actions ---------- */
+const sl = l => { S.lang = l; save(); R(); };
+const st = id => { S.theme = id; save(); R(); };
+const cc = c => { S.color = c; S.theme = 'custom'; save(); apply(); };
+const rs = () => { if (confirm(t('resetQ'))) { try { localStorage.removeItem(K); } catch (e) {} S = defaults(); go('home'); } };
+const tg = (k, id) => { const i = S.work[k].find(x => x.id == id); i.done = !i.done; save(); R(); };
+const dl = (kind, k, id) => { S[kind][k] = (S[kind][k] || []).filter(x => x.id != id); save(); R(); };
+const mu = (dw, i, d) => { const a = S.tt[dw], j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; save(); R(); };
+
+// Form fields: [name, label key, input type, required]
+const F = {
+  work: [['t','title','text',1],['d','descr','ta'],['s','subject','text'],['due','due','date']],
+  exam: [['s','subjectReq','text',1],['t','examTitle','text'],['tm','time','time'],['n','notesL','ta']],
+  rem: [['t','title','text',1],['tm','time','time']],
+  tt: [['n','subjectReq','text',1]]
+};
+
+function fm(kind, k, id) {
+  const o = ((S[kind][k] || []).find(x => x.id == id)) || {};
+  $('#dlg').innerHTML = `<form onsubmit="return sv(event,'${kind}','${k}','${id || ''}')"><h3>${t(id ? 'edit' : 'add')}</h3>` +
+    F[kind].map(([n, l, ty, rq]) => `<label>${t(l)}${ty === 'ta' ? `<textarea name="${n}">${esc(o[n])}</textarea>` : `<input name="${n}" type="${ty}" value="${esc(o[n])}" ${rq ? 'required' : ''}>`}</label>`).join('') +
+    `<div class="row"><button type="button" class="btn ghost" onclick="$('#dlg').close()">${t('cancel')}</button><button class="btn">${t('save')}</button></div></form>`;
+  $('#dlg').showModal();
+}
+
+function sv(e, kind, k, id) {
+  e.preventDefault();
+  const o = Object.fromEntries(new FormData(e.target));
+  Object.keys(o).forEach(x => o[x] = o[x].trim());
+  const a = S[kind][k] = S[kind][k] || [];
+  const i = id && a.find(x => x.id == id);
+  if (i) Object.assign(i, o); else a.push(Object.assign({id: Date.now(), done: false}, o));
+  save(); $('#dlg').close(); R();
+  return false;
+}
+
+/* ---------- Photo import (on-device OCR via Tesseract.js) ---------- */
+const normW = w => w.toLowerCase().replace(/[^a-z\u0600-\u06ff]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه');
+const DAYS = [['sunday','sun','الأحد','أحد'],['monday','mon','الاثنين','الإثنين','اثنين'],['tuesday','tue','tues','الثلاثاء','ثلاثاء'],
+['wednesday','wed','الأربعاء','أربعاء'],['thursday','thu','thur','thurs','الخميس','خميس'],['friday','fri','الجمعة','جمعة'],['saturday','sat','السبت','سبت']].map(a => a.map(normW));
+const dayOf = w => { w = normW(w); return w ? DAYS.findIndex(a => a.includes(w)) : -1; };
+
+function scanCard() {
+  return `<section class="card"><h3>📷 ${t('scan')}</h3><p class="empty">${t('scanHint')}</p>
+  <input type="file" accept="image/*" aria-label="${t('scan')}" onchange="ocr(this.files[0])">
+  <p id="ocrSt" aria-live="polite"></p><textarea id="ocrTxt" placeholder="${t('scanPh')}"></textarea>
+  <button class="btn" onclick="importTT()">${t('scanAdd')}</button></section>`;
+}
+
+function parseTT(txt) {
+  const out = {}; let d = null;
+  txt.split('\n').forEach(line => {
+    let l = line.trim(); if (!l) return;
+    const tk = l.split(/\s+/), i = tk.findIndex(w => dayOf(w) > -1);
+    let rev = false;
+    if (i > -1) { // day name at the start OR end of a table row
+      d = dayOf(tk[i]); out[d] = out[d] || [];
+      rev = tk.length > 1 && i === tk.length - 1; // day on the right edge: row was read left-to-right, so flip it
+      tk.splice(i, 1); l = tk.join(' ');
+    }
+    if (d === null || !l) return;
+    const clean = s => s.replace(/^(\d+\s*[.)\-:]|[•*\-–])\s*/, '').trim();
+    let parts = l.split(/\s{2,}|[|,،;]/).map(clean).filter(s => s.length > 1);
+    if (parts.length < 2 && (l.match(/\S*\d\S*/g) || []).length >= 3) parts = l.split(/\s+/).map(clean).filter(s => s.length > 1);
+    if (rev) parts.reverse();
+    out[d].push(...parts);
+  });
+  return out;
+}
+
+function importTT() {
+  const o = parseTT($('#ocrTxt').value); let n = 0;
+  Object.keys(o).forEach(d => {
+    const a = S.tt[d] = S.tt[d] || [];
+    o[d].forEach(s => { if (!a.some(x => nm(x) === s.toLowerCase())) a.push({id: Date.now() + n++, n: s}); });
+  });
+  if (!n) { alert(t('scanNone')); return; }
+  save(); R();
+}
+
+const loadTess = () => window.Tesseract ? Promise.resolve() : new Promise((ok, no) => {
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+  s.onload = ok; s.onerror = no; document.head.appendChild(s);
+});
+
+async function ocr(f) {
+  if (!f) return;
+  const st = $('#ocrSt'); st.textContent = t('scanning');
+  try {
+    await loadTess();
+    const r = await Tesseract.recognize(f, 'eng+ara', {logger: m => { if (m.status === 'recognizing text') st.textContent = t('scanning') + ' ' + Math.round(m.progress * 100) + '%'; }});
+    $('#ocrTxt').value = r.data.text; st.textContent = t('scanDone');
+  } catch (e) { st.textContent = t('scanFail'); }
+}
+
+R();
+
+</script>
+</body>
+</html>
